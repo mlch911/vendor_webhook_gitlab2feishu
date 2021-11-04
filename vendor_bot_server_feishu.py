@@ -4,19 +4,13 @@ from time import localtime,strftime
 import os
 import requests
 import json
-from dotenv import load_dotenv
 from rich.console import Console
 
 requests.packages.urllib3.disable_warnings()
 
-load_dotenv()
-API_TOKEN = os.getenv('API_TOKEN')
-
-if API_TOKEN == None or len(API_TOKEN) == 0:
-    raise RuntimeError('请先配置.env文件中的API_TOKEN')
-
 app = Bottle()
 console = Console(width=200)
+API_TOKEN = ''
 
 @app.route('/')
 @app.route('/<path>')
@@ -39,6 +33,11 @@ def vendor_bot():
     result = False
     post_string = ''
     post_dict = {}
+
+    global API_TOKEN
+    API_TOKEN = request.headers.get('X-Gitlab-Token')
+    if API_TOKEN == None or len(API_TOKEN) == 0:
+        raise RuntimeError('请先配置.env文件中的API_TOKEN')
 
     try:
         post_dict = request.json
